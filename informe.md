@@ -227,12 +227,21 @@ Porque si está junto con los datos seudonimizados cualquiera con acceso al conj
 
 **¿Qué principio de seguridad se aplica al impedir que el analista acceda al mapa?**
 
-
+Se aplican el principio de mínimo privilegio (solo el acceso necesario para su función) y la separación de funciones (quien analiza no es quien puede reidentificar).
 
 **¿Por qué una vista puede ser preferible a entregar acceso directo a la tabla?**
 
+Porque la vista expone solo las columnas y filas necesarias, y puede incluir datos enmascarados o seudonimizados, sin dar permisos sobre la tabla base. Además de que educe la superficie de exposición, centraliza la regla de protección en un solo lugar, permite cambiar la tabla extra generada sin afectar a los usuarios, facilita conocer qué se entrega a cada rol. Todo esto si el usuario no tiene permiso de acceder sobre la tabla original.
+
 **¿Qué diferencia existe entre proteger un dato para visualización y protegerlo contra acceso no autorizado?**
+
+Proteger para visualización (enmascaramiento) controla qué ve un usuario que ya está autorizado a consultar. Proteger contra acceso no autorizado (autenticación, roles, permisos, cifrado) controla quién puede entrar y qué puede hacer. Lo primero no sustituye a lo segundo: una máscara no sirve si alguien puede leer la tabla original o el respaldo.
 
 **¿Por qué la retención forma parte de la protección de datos?**
 
+Porque un dato que ya no se conserva no puede filtrarse, usarse indebidamente ni ser solicitado en un litigio. La retención aplica el principio de minimización y limitación del plazo de conservación de la LFPDPPP, donde se define cuánto tiempo hay una finalidad legítima y obliga a eliminar o anonimizar después.
+
 **¿Qué riesgo existe si una organización conserva información indefinidamente?**
+
+Existen distintos riesgos, primero un mayor impacto en una filtración: más registros y más antiguos expuestos, un incumplimiento legal por conservar sin finalidad vigente. Contar con datos obsoletos o inexactos que afectan decisiones. Además que es más costo y complejo el almacenamiento, respaldo y seguridad de una mayor cantidad de datos.
+Mayor exposición ante auditorías, solicitudes de supresión (derechos ARCO) y litigios.
