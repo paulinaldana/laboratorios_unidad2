@@ -1,42 +1,82 @@
-## 7.3 Generar una representación no reversible
+## 8. Actividad 2 — Cifrado de información sensible
 
-**Objetivo**
+### **Objetivo**
 
-Comprender cómo generar una representación no reversible de una contraseña mediante las funciones crypt() y gen_salt() de PostgreSQL, identificando su funcionamiento y las diferencias entre el cifrado reversible y el hash de contraseñas.
+Comprender cómo proteger información sensible mediante cifrado simétrico en PostgreSQL, utilizando el campo RFC como ejemplo. Asimismo, identificar las diferencias entre el hash de contraseñas y el cifrado reversible, y reconocer los riesgos relacionados con el manejo de claves de cifrado.
 
-**Comando o procedimiento**
-- ***Primero***, se ejecutó el siguiente comando para generar una representación de la contraseña mediante el algoritmo Blowfish:
-`SELECT crypt(
-    'Password123',
-    gen_salt('bf')
+### **Comando o procedimiento**
+
+**1. Creación de una tabla para almacenar información cifrada**
+
+Se creó la tabla clientes_protegidos, que contiene un identificador, el nombre del cliente y un campo de tipo BYTEA para almacenar el RFC cifrado.
+
+`CREATE TABLE clientes_protegidos (
+    id BIGSERIAL PRIMARY KEY,
+    nombre VARCHAR(120) NOT NULL,
+    rfc_cifrado BYTEA NOT NULL
 );`
 
-- ***Posteriormente***, se ejecutó nuevamente el mismo comando para comparar ambos resultados y observar si la representación generada era idéntica.
+**2. Inserción del registro con cifrado simétrico**
 
-**Resultado obtenido**
+Se insertó un registro de prueba utilizando la función pgp_sym_encrypt(), que cifra el RFC mediante una clave proporcionada.
 
-En ambas ejecuciones se obtuvieron cadenas de caracteres diferentes, aunque se utilizó la misma contraseña de entrada (Password123).
-Esto ocurre porque la función gen_salt('bf') genera una sal aleatoria en cada ejecución, lo que produce representaciones distintas para una misma contraseña.
+`INSERT INTO clientes_protegidos (
+    nombre,
+    rfc_cifrado
+)
+VALUES (
+    'Ana López',
+    pgp_sym_encrypt('LOPA900101ABC', 'CLAVE-DE-PRUEBA')
+);`
 
-**Análisis**
+**3. Consulta de los datos almacenados**
+
+Se consultó la tabla para observar cómo se almacena el RFC después del proceso de cifrado.
+
+`SELECT *
+FROM clientes_protegidos;`
+
+**4. Recuperación del dato original**
+
+Finalmente, se utilizó pgp_sym_decrypt() con la misma clave para descifrar el RFC y recuperar su valor original.
+
+`SELECT
+    id,
+    nombre,
+    pgp_sym_decrypt(
+        rfc_cifrado,
+        'CLAVE-DE-PRUEBA'
+    ) AS rfc
+FROM clientes_protegidos;`
+
+### **Resultado obtenido**
+
+Al consultar la tabla `clientes_protegidos`, el RFC dejó de mostrarse directamente como texto legible, ya que se almacenó en formato binario cifrado dentro del campo `rfc_cifrado`.
+
+Al ejecutar la consulta de descifrado con la clave correcta, se recuperó el RFC original: `LOPA900101ABC`.
+
+Por lo tanto, se comprobó que PostgreSQL permite proteger información sensible mediante cifrado simétrico y recuperarla posteriormente cuando se dispone de la clave correspondiente.
+
+### **Análisis**
 
 **Preguntas**
 
-**1. ¿Son iguales?**
-No son iguales, las cadenas generadas son diferentes porque cada ejecución utiliza una sal aleatoria distinta.
+**¿Qué diferencia existe entre crypt() y pgp_sym_encrypt()?**
 
-**2. Si no son iguales, ¿por qué?**
-Porque se utilizó un mecanismo que cada vez que se ejecuta utiliza una sal aleatoria distinta.
+La función `crypt()` se utiliza para generar y verificar hashes de contraseñas, que son representaciones no reversibles. En cambio, `pgp_sym_encrypt()` cifra información utilizando una clave secreta, lo que permite recuperar el dato original mediante la función de descifrado correspondiente.
 
-**3. ¿Qué función cumple gen_salt()?**
-Genera una sal aleatoria que se utiliza como parte del proceso de protección de la contraseña. El parámetro `'bf'` indica el uso del algoritmo Blowfish, compatible con bcrypt.
+**¿Cuál de los dos mecanismos permite recuperar el dato original?**
 
-**4. ¿Qué función cumple crypt()?**
-Calcula una representación derivada de la contraseña utilizando el algoritmo y la sal proporcionados. En este caso, genera un hash de contraseña mediante bcrypt.
+El cifrado simétrico mediante `pgp_sym_encrypt()` permite recuperar el dato original con `pgp_sym_decrypt()` y la clave correcta. En cambio, un hash generado con ``crypt()`` no está diseñado para revertirse y recuperar la contraseña original.
 
-**5. ¿Esto es cifrado reversible?**
-No. Se trata de un proceso de hash, no de cifrado reversible. No es posible recuperar directamente la contraseña original a partir del hash. Para comprobar una contraseña, se vuelve a calcular su representación utilizando el hash almacenado y se comparan los resultados.
+**¿Qué ocurre si se utiliza una clave incorrecta?**
 
-**Conclusión**
+El proceso de descifrado normalmente falla y PostgreSQL genera un error, ya que no puede descifrar correctamente la información con la clave proporcionada. No se obtiene de manera válida el RFC original.
 
-La actividad permitió comprender la importancia de proteger las contraseñas mediante funciones de hash en lugar de almacenarlas como texto plano. Se observó que gen_salt() genera una sal aleatoria y que crypt() utiliza dicha sal para producir un hash mediante bcrypt. Aunque una misma contraseña puede generar resultados diferentes, estos pueden utilizarse para verificar su autenticidad sin necesidad de recuperar la contraseña original.
+**¿Qué problema de seguridad representa colocar la clave directamente en una consulta?**
+
+Incluir la clave directamente en una consulta puede exponerla en registros de consultas, archivos de configuración, historiales de ejecución o herramientas de monitoreo, dependiendo del entorno. Si una persona no autorizada obtiene la clave y los datos cifrados, podría recuperar la información sensible. Por ello, en aplicaciones reales las claves deben administrarse mediante mecanismos seguros, limitar su acceso y evitar almacenarlas directamente en el código fuente.
+
+### **Conclusión**
+
+La actividad permitió comprender que el cifrado simétrico constituye una alternativa para proteger información sensible, como el RFC de un cliente, cuando es necesario recuperarla posteriormente. Mediante las funciones ``pgp_sym_encrypt()`` y ``pgp_sym_decrypt()`` fue posible cifrar y recuperar el dato original utilizando la misma clave. Asimismo, se identificó que la seguridad del mecanismo depende tanto de la protección de los datos cifrados como del manejo adecuado de las claves.
