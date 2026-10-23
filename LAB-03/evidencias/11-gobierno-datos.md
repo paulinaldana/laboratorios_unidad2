@@ -1,0 +1,16 @@
+# 17. Actividad 11 — Diseñar una matriz de gobierno de datos
+
+
+| **Dato** | **Finalidad** | **Responsable** | **Usuarios autorizados** | **Protección** | **Retención** | **Acción al finalizar** |
+|---|---|---|---|---|---|---|
+| nombre | Identificar al cliente y atender sus solicitudes. | Atención al cliente | Atención al cliente, Analítica (cuando sea necesario) | Acceso restringido y enmascaramiento en reportes analíticos. | Mientras sea necesario para la atención y durante el periodo adicional justificado. | Eliminar o anonimizar cuando deje de ser necesario. |
+| correo | Contactar al cliente y dar seguimiento a sus solicitudes. | Atención al cliente | Atención al cliente | Acceso restringido y protección en consultas y reportes. | Mientras sea necesario para la comunicación y durante el periodo adicional justificado. | Eliminar o anonimizar cuando deje de ser necesario. |
+| telefono | Contactar al cliente para resolver dudas o dar seguimiento a servicios. | Atención al cliente | Atención al cliente | Acceso restringido y visualización parcial cuando no se requiera el número completo. | Mientras sea necesario para la atención y durante el periodo adicional justificado. | Eliminar o anonimizar cuando deje de ser necesario. |
+| rfc | Identificar fiscalmente al cliente cuando sea necesario para procesos de facturación. | Facturación | Facturación; DBA únicamente para tareas técnicas autorizadas. | Acceso estrictamente restringido, cifrado cuando corresponda y ocultamiento en reportes. | Durante el periodo exigido por las obligaciones fiscales aplicables. | Eliminar o bloquear conforme a las obligaciones legales y al procedimiento establecido. |
+| edad | Analizar características generales de los clientes y elaborar estadísticas. | Analítica | Analítica; Atención al cliente solo si existe una necesidad justificada. | Preferir rangos de edad y datos agregados para los análisis. | Mientras sea necesaria para la finalidad analítica autorizada. | Eliminar o anonimizar cuando deje de ser necesaria. |
+| ciudad | Analizar la distribución geográfica de los clientes y generar estadísticas. | Analítica | Analítica, Atención al cliente cuando sea necesario para atender solicitudes. | Acceso controlado y uso de datos agregados en reportes. | Mientras sea necesaria para las finalidades autorizadas. | Eliminar o anonimizar cuando deje de ser necesaria. |
+| codigo_postal | Apoyar la validación de domicilios y el análisis geográfico. | Atención al cliente | Atención al cliente; Analítica con acceso limitado según el análisis requerido. | Acceso restringido y generalización del código postal en reportes cuando sea posible. | Mientras sea necesario para la finalidad correspondiente. | Eliminar o anonimizar cuando deje de ser necesario. |
+
+## Conclusión
+
+Es importante organizar y controlar el uso de la información de los clientes. Se debe definir quién puede acceder a ellos y con qué propósito y bajo qué medidas de protección. Ejercer este tipo de prácticas permite reducir los riesgos de acceso no autorizado, mejorar la privacidad y establecer procedimientos con buenas prácticas. Una gestión adecuada de datos requiere que los permisos se asignen según las necesidades y funciones de cada área, así como que la información se conserve únicamente durante el tiempo requerido y legalmente justificado.
